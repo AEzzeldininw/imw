@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_journal_entries" model="ir.actions.report">
+            <field name="name">Journal Entry</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">imw_customization.report_journal_entries</field>
+            <field name="report_file">imw_customization.report_journal_entries</field>
+            <field name="binding_model_id" ref="imw_customization.model_account_move"/>
+            <field name="binding_type">report</field>
+        </record>
+        <record id="action_report_bank_statement" model="ir.actions.report">
+            <field name="name">Bank Statement</field>
+            <field name="model">account.bank.statement</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">imw_customization.report_bank_statement</field>
+            <field name="report_file">imw_customization.report_bank_statement</field>
+            <field name="binding_model_id" ref="imw_customization.model_account_bank_statement"/>
+            <field name="binding_type">report</field>
+        </record>
+        <record id="action_report_vendor_bill" model="ir.actions.report">
+            <field name="name">Vendor Bill</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">imw_customization.report_vendor_bill</field>
+            <field name="report_file">imw_customization.report_vendor_bill</field>
+            <field name="binding_model_id" ref="imw_customization.model_account_move"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

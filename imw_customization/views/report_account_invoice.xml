@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<odoo>
+
+<template id="account.report_invoice_document">
+    <div class="article o_report_layout_standard" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">           
+             <div name="reference"/>
+            <t> 
+                <t t-set="o" t-value="o.with_context({'lang': lang})"/>
+                
+                <div class="page"><center>
+                      <div class="text-center">
+                        <strong><span t-if="o.move_type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice No.</span></strong>
+                        <strong><span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span></strong>
+                        <strong><span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span></strong>
+                        <strong><span t-if="o.move_type == 'out_refund'">Credit Note</span></strong>
+                        <strong><span t-if="o.move_type == 'in_refund'">Vendor Credit Note</span></strong>
+                        <strong><span t-if="o.move_type == 'in_invoice'">Vendor Bill</span></strong>
+                        <span t-field="o.invoice_origin"/>
+                    </div>
+                  </center>
+                  <t t-set="address">
+                    <address t-field="o.partner_id" 
+                    t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                </t>
+                <div id="informations" class="col-xs-2 col-xs-offset-9">
+                      <div class="container">
+                        <div class="row">
+                            <div class="col-9" t-if="o.partner_id">
+                              <p><strong>To:</strong><span>  </span><span class="m-0" t-field="o.partner_id.name"/></p>
+                            </div>
+                           
+                              <div class="col-3" align="right" t-if="o.ref">
+                                  <p><span class="m-0" t-field="o.ref"/></p>
+                              </div>
+                          </div>
+                          </div>
+                            <div class="container">
+                              <div class="row">
+                                <div class="col-8"  align="left" t-if="o.partner_id.contact_address">
+                                   <p><strong>Address:</strong><span>   </span><span class="m-0" t-field="o.partner_id.street"/> <span> </span><span class="m-0" t-field="o.partner_id.city"/> <span> </span> <span class="m-0" t-field="o.partner_id.country_id"/></p>                                   
+                                </div>
+                                <div class="col-4" align="right" t-if="o.name">
+                                        <p><strong></strong><span></span><span class="m-0" t-field="o.name"/></p>
+                                </div>
+                              </div>
+                            </div>
+                              <div class="container">
+                                <div class="row">
+                                    <div class="col-12" t-if="o.partner_id.child_ids">
+                                      <p><strong> Contact:</strong><span>   </span><span class="m-0" t-field="o.partner_id.child_ids[0].title"/> <span t-field="o.partner_id.child_ids[0].name"/></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                              <div class="row">
+                                <div class="col-6" align="left" t-if="o.invoice_date">
+                                        <p><strong>Date:</strong><span></span><span class="m-0" t-field="o.invoice_date"/></p>
+                                </div>                                
+                              </div>
+                            </div>
+                    
+                </div>
+                <!-- end section 1-->
+<t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+
+                    <table class="table table-sm o_main_table" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <t t-set="colspan" t-value="6"/>
+                                <th class="text-left"><span>Description</span></th>
+                                <th class="text-right mw-100" width="25%"><span>Unit</span></th>
+                                <th t-attf-class="text-right {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
+                                <th class="text-right">
+                                    <span>Amount</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="imw_total" t-value="0"/>
+                            
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <t t-set="imw_unit_price" t-value="line.price_unit * line.imw_qty"/>
+                                <t t-set="imw_current_subtotal" t-value="imw_unit_price * line.imw_measurement"/>
+                                <t t-set="imw_total" t-value="imw_total + imw_current_subtotal"/>
+                                <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type" name="account_invoice_line_accountable">
+                                        <td class="text-left" width="70%">
+                                            <t t-esc="o.amount_to_word(line.imw_qty)"/>
+                                            (<span t-field="line.imw_qty"  t-options='{"widget": "float", "precision": 0}'/>) <span t-field="line.name"/>
+                                              (<span t-field="line.imw_qty" t-options='{"widget": "float", "precision": 0}'/> X <span t-field="line.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>)
+                                        </td>
+                                        <td class="text-right" name="account_invoice_line_name"> <span t-field="line.imw_measurement" t-options='{"widget": "float", "precision": 2}'/> <span t-field="line.otherUnitMeasure"/></td>
+                                        
+                                        <td class="text-right"><span t-esc="imw_unit_price" t-options='{"widget": "float", "precision": 2}'/></td>
+                                        <td class="text-right o_price_total">
+                                            <span t-esc="imw_current_subtotal" t-options='{"widget": "float", "precision": 2}'/>
+                                        </td>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <td t-att-colspan="colspan">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_note'">
+                                        <td t-att-colspan="colspan">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+<!--End section 2-->
+                                      <div class="clearfix">
+                        <div id="total">
+                            <div class="ml-auto">
+                                <table class="table table-sm">
+                                    <tr class="border-black o_total">
+                                      <td class="text-left">
+                                        <span t-esc="o.currency_id.amount_to_text(imw_total)"/>
+                                        </td>
+
+                                        <td class="text-right"><strong><span class="pull-right"/> Total</strong></td>
+                                        <td class="text-right">
+                                          <span class="pull-right" t-esc="imw_total"  t-options='{"widget": "float", "precision": 2}'/><br/>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+<!--End section 3-->
+                    <t t-if="o.currency_id.name=='EGP'">
+                      <div class="container">
+                        <div class="row">
+                        <div class="col-12 " >
+                          <h5>Bank Details (Attached)</h5>
+                        </div>
+                      </div>
+                      </div>
+                    </t>
+                    <t t-if="o.currency_id.name!='EGP'">
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-12">
+                          <h5>Bank Details (Attached)</h5>
+                        </div>
+                      </div>
+                    </div>  
+                  </t>
+                  <!--End section 4-->
+
+                    <xpath expr="//div[@class='footer']" position="replace">
+
+                        <div class="footer">
+                          <div class='container'>
+                            <div class='row'>
+                              <div class='col-2'>
+                                <span class="pull-left">QP</span>
+                              </div>
+                              <div class='col-6'>
+                                <p class='text-center'><span>Page </span><span class="page text-right" /> of <span class="topage" /></p>
+                              </div>
+                              
+                              <div class='col-4'>
+                                <p class="text-right">Form 17-QP 07</p>
+                              </div>                              
+                            </div>                        
+                          </div>
+                        </div>
+                    </xpath>
+                </div>
+            </t>
+         </div>
+         
+    </template>
+</odoo>
+

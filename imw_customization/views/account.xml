@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="invoice_order_view_inherit">
+            <field name="name">Invoice.order.view.inherit1</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="imw_ref2"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']"
+                       position="before">
+                    <field name="category_id"/>
+                </xpath>
+                <field name="product_id" context="{'group_by':'categ_id'}" domain="[('to_sell','=',True))]"/>
+
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']"
+                       position="after">
+                    <field name="imw_measurement"/>
+                    <field name="otherUnitMeasure"/>
+                    <field name="imw_qty"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_bank_statement_form_inherit">
+            <field name="name">view_bank_statement_form.inherit1</field>
+            <field name="model">account.bank.statement</field>
+            <field name="inherit_id" ref="account.view_bank_statement_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='journal_id']" position="before">
+                    <field name="referenceRecive"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_move_tree_inherit">
+            <field name="name">view_account_move_tree_inherit1</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='ref']" position="after">
+                    <field name="imw_ref2"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_bank_statement">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="doc">
+        <t t-call="imw_customization.report_bank_statement_document" />
+      </t>
+    </t>
+  </template>
+   <template id="report_bank_statement_document">
+       <t t-call="web.external_layout">
+
+
+       <div class="page">
+        <div class="oe_structure"/>
+     <div class="page">
+        <div class="oe_structure"/>
+        <div>
+          <h2><span class="text-left" t-field="doc.name"/></h2>
+        </div>
+           <div id="informations" class="row mt32 mb32">
+              <div class="col-auto mw-100 mb-2">
+                <strong>R Reference:</strong>
+                <p class="m-0" t-field="doc.referenceRecive"/>
+              </div>
+              <div class="col-auto mw-100 mb-2">
+                <strong>Journal:</strong>
+                <p class="m-0" t-field="doc.journal_id"/>
+              </div>
+              <div class="col-auto mw-100 mb-2" >
+                <strong>Date:</strong>
+                <p class="m-0" t-field="doc.date"/>
+              </div>
+              <div class="col-auto mw-100 mb-2" >
+                <strong>Accounting Date:</strong>
+                <p class="m-0" t-field="doc.date"/>
+              </div>
+           </div>
+    </div>
+       <table class="table" >
+                        <thead>
+                            <tr>
+                                <th class="text-left"><span>Date</span></th>
+                                <th class=" text-left"><span>Name</span></th>
+                                <th class="text-left"><span>Partner</span></th>
+                                <th class="text-left"><span>Reference</span></th>
+                                <th class="text-left"><span>Amount</span></th>
+                              </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <t t-foreach="doc.line_ids" t-as="line">
+                            <tr>
+                                <td><span t-field="line.date"/></td>
+                                <td><span t-field="line.name"/></td>
+                                <td><span t-field="line.partner_id"/></td>
+                                <td><span t-field="line.ref"/></td>
+                                <td><span t-field="line.amount"/></td>
+                              </tr>
+                            </t>
+                        </tbody>
+        </table>
+       <div class="col-auto mw-100 mb-2 text-right" >
+          <span >Computed Balance:</span>
+          <span class="m-0" t-field="doc.balance_end"/>
+        </div>
+       </div>
+       </t>
+
+   </template>
+
+</odoo>
+
+
